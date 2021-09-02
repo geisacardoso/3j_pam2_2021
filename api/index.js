@@ -8,9 +8,13 @@ const banco = mysql.createPool({
   host: "localhost",
   port: "3306",
 });
+
 const bodyParser = require('body-parser')
+
 servidor.use(bodyParser.urlencoded({extended: false}))
+
 servidor.use(bodyParser.json())
+
 servidor.post("/cliente", (req, res, next) => {
   let body = req.body
   const QUERY = `INSERT INTO clientes (nome, login, senha) VALUES('${body.nome}', '${body.login}', '${body.senha}')`
