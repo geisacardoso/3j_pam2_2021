@@ -4,7 +4,7 @@ const mysql = require("mysql2");
 const banco = mysql.createPool({
   database: "3j_2021",
   user: "root",
-  password: "",
+  password: "minas",
   host: "localhost",
   port: "3306",
 });
@@ -44,10 +44,39 @@ servidor.post("/cliente", (req, res, next) => {
 servidor.delete("/cliente/:id", (req, res, next) => {
   let id = req.params.id
 
-  return res.status(200).send({
-    Verbo: 'delete',
-    Mensagem: `Id capturado ${id}`
+  const QUERY = `DELETE FROM clientes WHERE cliente_id=${id}`
+
+  banco.getConnection((error, conn) => {
+    if(error){
+      return res.status(500).send({
+        mensagem: 'Erro no servidor',
+        detalhes: error
+      })
+    }
+
+    conn.query(QUERY, (error, resultados) => {
+      conn.release()
+
+      if(error){
+        return res.status(500).send({
+          mensagem: `Não foi possível excluir o cliente ${id}`,
+          detalhes: error
+        })
+      }
+
+      if(resultados.affectedRows > 0){
+        return res.status(200).send({
+          mensagem: `Cliente ${id} exclído com sucesso`
+        })
+      }else{
+        return res.status(200).send({
+          mensagem: `Cliente ${id} não existe no banco de dados`
+        })
+      }
+    })
   })
+
+  
 })
 
 servidor.patch("/cliente/:id", (req, res, next) => {
